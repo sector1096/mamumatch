@@ -1,9 +1,6 @@
-﻿import json
 import re
 import subprocess
 from datetime import datetime
-
-import requests
 
 from app.core.config import settings
 
@@ -40,67 +37,13 @@ def build_query(equipos: str | None, evento: str | None, anio: int | None) -> st
     return query.strip() or "dota 2 full match"
 
 
-def search_youtube_api(query: str, limit: int = 10) -> list[dict]:
-    key = settings.youtube_api_key.strip()
-    if not key:
-        return []
-
-    search_url = "https://www.googleapis.com/youtube/v3/search"
-    params = {
-        "part": "snippet",
-        "q": query,
-        "maxResults": min(limit, 25),
-        "type": "video",
-        "key": key,
-        "order": "relevance",
-    }
-    resp = requests.get(search_url, params=params, timeout=20)
-    resp.raise_for_status()
-    items = resp.json().get("items", [])
-    video_ids = [item.get("id", {}).get("videoId") for item in items if item.get("id", {}).get("videoId")]
-    if not video_ids:
-        return []
-
-    details_url = "https://www.googleapis.com/youtube/v3/videos"
-    detail_params = {
-        "part": "contentDetails",
-        "id": ",".join(video_ids),
-        "key": key,
-    }
-    details_resp = requests.get(details_url, params=detail_params, timeout=20)
-    details_resp.raise_for_status()
-    duration_map = {
-        item["id"]: normalize_duration_iso8601(item.get("contentDetails", {}).get("duration"))
-        for item in details_resp.json().get("items", [])
-    }
-
-    out = []
-    for item in items:
-        snippet = item.get("snippet", {})
-        video_id = item.get("id", {}).get("videoId")
-        if not video_id:
-            continue
-        title = snippet.get("title") or ""
-        channel = snippet.get("channelTitle") or ""
-        out.append(
-            {
-                "title": title,
-                "channel": channel,
-                "url": f"https://www.youtube.com/watch?v={video_id}",
-                "duration_seconds": duration_map.get(video_id),
-                "language_guess": guess_language(f"{title} {channel}"),
-            }
-        )
-    return out
-
-
 def search_ytdlp(query: str, limit: int = 10) -> list[dict]:
     cmd = [
         settings.yt_dlp_path,
         f"ytsearch{limit}:{query}",
-        "--dump-json",
+        "--print",
+        "%(id)s\t%(title)s\t%(duration)s\t%(uploader)s",
         "--skip-download",
-        "--flat-playlist",
         "--no-warnings",
         "--ignore-config",
     ]
@@ -112,30 +55,33 @@ def search_ytdlp(query: str, limit: int = 10) -> list[dict]:
     for line in proc.stdout.splitlines():
         if not line.strip():
             continue
-        try:
-            obj = json.loads(line)
-        except json.JSONDecodeError:
+        parts = line.split("\t", 3)
+        if len(parts) != 4:
             continue
-        title = obj.get("title") or ""
-        channel = obj.get("uploader") or obj.get("channel") or ""
-        url = obj.get("url")
-        if url and not url.startswith("http"):
-            url = f"https://www.youtube.com/watch?v={url}"
+        video_id, title, duration_raw, uploader = (p.strip() for p in parts)
+        if not video_id:
+            continue
+
+        duration = None
+        if duration_raw.isdigit():
+            duration = int(duration_raw)
+        elif duration_raw:
+            duration = normalize_duration_iso8601(duration_raw)
+
         items.append(
             {
                 "title": title,
-                "channel": channel,
-                "url": url,
-                "duration_seconds": obj.get("duration"),
-                "language_guess": guess_language(f"{title} {channel}"),
+                "channel": uploader,
+                "url": f"https://www.youtube.com/watch?v={video_id}",
+                "duration_seconds": duration,
+                "language_guess": guess_language(f"{title} {uploader}"),
             }
         )
+
     return items
 
 
 def find_video_candidates(equipos: str | None, evento: str | None, anio: int | None, limit: int = 10) -> dict:
     query = build_query(equipos, evento, anio)
-    items = search_youtube_api(query, limit=limit)
-    if not items:
-        items = search_ytdlp(query, limit=limit)
+    items = search_ytdlp(query, limit=limit)
     return {"query": query, "items": items[:limit], "generated_at": datetime.utcnow().isoformat()}

@@ -1,4 +1,5 @@
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+const runtimeDefaultApiUrl = `${window.location.protocol}//${window.location.hostname}:8001`;
+export const API_URL = import.meta.env.VITE_API_URL || runtimeDefaultApiUrl;
 
 const API_KEY = import.meta.env.VITE_API_KEY || "change-me";
 

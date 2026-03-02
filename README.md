@@ -88,8 +88,7 @@ Todos requieren `X-API-Key`.
 
 - Boton en detalle: "Buscar videos candidatos".
 - Strategy:
-  1. YouTube Data API (si `APP_YOUTUBE_API_KEY` existe)
-  2. Fallback `yt-dlp ytsearch10:`
+  1. `yt-dlp ytsearch10:<query>` (sin cuotas de YouTube API)
 
 ## Logs de jobs
 
