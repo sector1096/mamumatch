@@ -1,0 +1,81 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  --bg: #f6f8fb;
+  --text: #1f2937;
+  --primary: #0f766e;
+  --panel: #ffffff;
+  --border: #d1d5db;
+  --ok: #0f766e;
+  --ko: #9f1239;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+
+.app-shell { min-height: 100vh; }
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(120deg, #0f766e, #134e4a);
+  color: #fff;
+}
+.topbar nav { display: flex; gap: 12px; }
+.topbar a { color: #fff; text-decoration: none; font-weight: 600; }
+.content { padding: 16px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+input, select, button, a {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+button { cursor: pointer; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { border-bottom: 1px solid var(--border); text-align: left; padding: 8px; font-size: 13px; }
+
+.actions-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.badges-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 11px; border-radius: 999px; padding: 3px 8px; font-weight: 700; }
+.badge.ok { color: #fff; background: var(--ok); }
+.badge.ko { color: #fff; background: var(--ko); }
+
+.log-box {
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow: auto;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.error { color: #b91c1c; font-weight: 600; }
+.inline-label { flex-direction: row; align-items: center; gap: 8px; }
+.candidate-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }

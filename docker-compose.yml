@@ -1,0 +1,87 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: mamumatch-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mamumatch-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: mamumatch-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - APP_REDIS_URL=${APP_REDIS_URL}
+      - APP_DB_HOST=${APP_DB_HOST}
+      - APP_DB_PORT=${APP_DB_PORT}
+      - APP_DB_USER=${APP_DB_USER}
+      - APP_DB_PASSWORD=${APP_DB_PASSWORD}
+      - APP_DB_NAME=${APP_DB_NAME}
+      - APP_API_KEY=${APP_API_KEY}
+      - APP_VIDEOS_DIR=${APP_VIDEOS_DIR}
+      - APP_WHISPER_DIR=${APP_WHISPER_DIR}
+      - APP_LOGS_DIR=${APP_LOGS_DIR}
+      - APP_WHISPER_MODEL=${APP_WHISPER_MODEL}
+      - APP_WHISPER_DEVICE=${APP_WHISPER_DEVICE}
+      - APP_WHISPER_LANGUAGE_DEFAULT=${APP_WHISPER_LANGUAGE_DEFAULT}
+      - APP_YOUTUBE_API_KEY=${APP_YOUTUBE_API_KEY}
+      - APP_YT_DLP_PATH=${APP_YT_DLP_PATH}
+      - APP_FFMPEG_PATH=${APP_FFMPEG_PATH}
+      - APP_RQ_QUEUE=${APP_RQ_QUEUE}
+    volumes:
+      - ./data:/data
+      - ./backend/migrations:/app/backend/migrations:ro
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+
+  mamumatch-worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    container_name: mamumatch-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - APP_REDIS_URL=${APP_REDIS_URL}
+      - APP_DB_HOST=${APP_DB_HOST}
+      - APP_DB_PORT=${APP_DB_PORT}
+      - APP_DB_USER=${APP_DB_USER}
+      - APP_DB_PASSWORD=${APP_DB_PASSWORD}
+      - APP_DB_NAME=${APP_DB_NAME}
+      - APP_API_KEY=${APP_API_KEY}
+      - APP_VIDEOS_DIR=${APP_VIDEOS_DIR}
+      - APP_WHISPER_DIR=${APP_WHISPER_DIR}
+      - APP_LOGS_DIR=${APP_LOGS_DIR}
+      - APP_WHISPER_MODEL=${APP_WHISPER_MODEL}
+      - APP_WHISPER_DEVICE=${APP_WHISPER_DEVICE}
+      - APP_WHISPER_LANGUAGE_DEFAULT=${APP_WHISPER_LANGUAGE_DEFAULT}
+      - APP_YOUTUBE_API_KEY=${APP_YOUTUBE_API_KEY}
+      - APP_YT_DLP_PATH=${APP_YT_DLP_PATH}
+      - APP_FFMPEG_PATH=${APP_FFMPEG_PATH}
+      - APP_RQ_QUEUE=${APP_RQ_QUEUE}
+    volumes:
+      - ./data:/data
+    depends_on:
+      - redis
+      - mamumatch-api
+
+  mamumatch-web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: mamumatch-web
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_API_KEY=${VITE_API_KEY}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mamumatch-api
