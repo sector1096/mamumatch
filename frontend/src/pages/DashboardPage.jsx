@@ -4,10 +4,8 @@ import { api } from "../api/client";
 import { Badge } from "../components/Badge";
 
 const initialFilters = {
-  q: "",
-  anio: "",
-  evento: "",
-  equipo: "",
+  id_partida: "",
+  estado: "",
   idioma: "",
   validado: "",
   video_descargado: "",
@@ -16,6 +14,74 @@ const initialFilters = {
   page: "1",
   size: "25",
 };
+
+const filterFields = [
+  { key: "id_partida", label: "ID Partida", type: "text", placeholder: "Ej: 12345" },
+  {
+    key: "estado",
+    label: "Estado",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "con_match_id", label: "Con match_id_dota" },
+      { value: "sin_match_id", label: "Sin match_id_dota" },
+    ],
+  },
+  {
+    key: "idioma",
+    label: "Idioma",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "es", label: "es" },
+      { value: "en", label: "en" },
+      { value: "pt", label: "pt" },
+      { value: "ru", label: "ru" },
+      { value: "zh", label: "zh" },
+      { value: "fr", label: "fr" },
+    ],
+  },
+  {
+    key: "validado",
+    label: "Validado",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "true", label: "Si" },
+      { value: "false", label: "No" },
+    ],
+  },
+  {
+    key: "video_descargado",
+    label: "Video descargado",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "true", label: "Si" },
+      { value: "false", label: "No" },
+    ],
+  },
+  {
+    key: "has_transcription",
+    label: "Whisper",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "true", label: "Si" },
+      { value: "false", label: "No" },
+    ],
+  },
+  {
+    key: "incompletas",
+    label: "Incompletas",
+    type: "select",
+    options: [
+      { value: "", label: "Todos" },
+      { value: "true", label: "Si" },
+      { value: "false", label: "No" },
+    ],
+  },
+];
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState(initialFilters);
@@ -85,18 +151,29 @@ export default function DashboardPage() {
     <section>
       <h2>Busqueda rapida</h2>
       <div className="panel filters-grid">
-        {Object.keys(initialFilters)
-          .filter((k) => k !== "page" && k !== "size")
-          .map((key) => (
-            <label key={key}>
-              <span>{key}</span>
+        {filterFields.map((field) => (
+          <label key={field.key}>
+            <span>{field.label}</span>
+            {field.type === "select" ? (
+              <select
+                value={filters[field.key]}
+                onChange={(e) => setFilters((p) => ({ ...p, [field.key]: e.target.value }))}
+              >
+                {field.options.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
               <input
-                value={filters[key]}
-                onChange={(e) => setFilters((p) => ({ ...p, [key]: e.target.value }))}
-                placeholder={key}
+                value={filters[field.key]}
+                onChange={(e) => setFilters((p) => ({ ...p, [field.key]: e.target.value }))}
+                placeholder={field.placeholder || field.label}
               />
-            </label>
-          ))}
+            )}
+          </label>
+        ))}
         <div className="actions-row">
           <button onClick={applySearch} disabled={loading}>
             Buscar

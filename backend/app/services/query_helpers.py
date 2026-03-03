@@ -9,7 +9,9 @@ from app.db.models import Partida, PipelineJob, SegmentoAudio, Transcripcion
 
 def apply_partidas_filters(
     query,
+    id_partida: int | None,
     q: str | None,
+    estado: str | None,
     anio: int | None,
     evento: str | None,
     equipo: str | None,
@@ -19,6 +21,8 @@ def apply_partidas_filters(
     has_transcription: bool | None,
     incompletas: bool | None,
 ):
+    if id_partida is not None:
+        query = query.where(Partida.id_partida == id_partida)
     if q:
         like = f"%{q.strip()}%"
         query = query.where(
@@ -32,6 +36,10 @@ def apply_partidas_filters(
                 func.cast(Partida.match_id_dota, String).ilike(like),
             )
         )
+    if estado == "con_match_id":
+        query = query.where(Partida.match_id_dota.is_not(None))
+    elif estado == "sin_match_id":
+        query = query.where(Partida.match_id_dota.is_(None))
     if anio is not None:
         query = query.where(Partida.anio == anio)
     if evento:

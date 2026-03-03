@@ -24,7 +24,9 @@ router = APIRouter(prefix="/partidas", tags=["partidas"], dependencies=[Depends(
 
 @router.get("", response_model=PartidasListResponse)
 def get_partidas(
+    id_partida: int | None = None,
     q: str | None = None,
+    estado: str | None = Query(default=None, pattern="^(con_match_id|sin_match_id)$"),
     anio: int | None = None,
     evento: str | None = None,
     equipo: str | None = None,
@@ -41,7 +43,9 @@ def get_partidas(
     base = select(Partida)
     base = apply_partidas_filters(
         base,
+        id_partida=id_partida,
         q=q,
+        estado=estado,
         anio=anio,
         evento=evento,
         equipo=equipo,
