@@ -23,7 +23,6 @@ body { margin: 0; background: var(--bg); color: var(--text); }
   color: #fff;
 }
 .topbar nav { display: flex; gap: 12px; }
-.topbar a { color: #fff; text-decoration: none; font-weight: 600; }
 .content { padding: 16px; }
 
 .panel {
@@ -57,10 +56,22 @@ input, select, button, a {
 }
 button { cursor: pointer; }
 
+.topbar-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+}
+.topbar-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 table { width: 100%; border-collapse: collapse; }
 th, td { border-bottom: 1px solid var(--border); text-align: left; padding: 8px; font-size: 13px; }
 
 .actions-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.actions-row-inline { margin-top: 8px; }
 .badges-cell { display: flex; gap: 6px; flex-wrap: wrap; }
 .badge { font-size: 11px; border-radius: 999px; padding: 3px 8px; font-weight: 700; }
 .badge.ok { color: #fff; background: var(--ok); }

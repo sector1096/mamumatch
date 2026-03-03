@@ -93,7 +93,6 @@ export default function DashboardPage() {
               <th>Equipos</th>
               <th>Idioma</th>
               <th>Estado</th>
-              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -104,16 +103,18 @@ export default function DashboardPage() {
                 <td>{item.evento || "-"} / {item.anio || "-"}</td>
                 <td>{item.equipos || "-"}</td>
                 <td>{item.idioma || "-"}</td>
-                <td className="badges-cell">
-                  <Badge ok={item.video_descargado} label="Video" />
-                  <Badge ok={item.has_transcription} label="Whisper" />
-                  <Badge ok={item.has_segments} label="Segmentos" />
-                  <Badge ok={item.validado} label="Validado" />
-                </td>
-                <td className="actions-row">
-                  <Link to={`/partidas/${item.id_partida}`}>Abrir</Link>
-                  <button onClick={() => enqueue(item.id_partida, "DOWNLOAD")}>Descargar</button>
-                  <button onClick={() => enqueue(item.id_partida, "TRANSCRIBE")}>Transcribir</button>
+                <td>
+                  <div className="badges-cell">
+                    <Badge ok={item.video_descargado} label="Video" />
+                    <Badge ok={item.has_transcription} label="Whisper" />
+                    <Badge ok={item.has_segments} label="Segmentos" />
+                    <Badge ok={item.validado} label="Validado" />
+                  </div>
+                  <div className="actions-row actions-row-inline">
+                    <Link to={`/partidas/${item.id_partida}`}>Abrir</Link>
+                    <button onClick={() => enqueue(item.id_partida, "DOWNLOAD")}>Descargar</button>
+                    <button onClick={() => enqueue(item.id_partida, "TRANSCRIBE")}>Transcribir</button>
+                  </div>
                 </td>
               </tr>
             ))}

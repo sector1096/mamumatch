@@ -10,8 +10,8 @@ export default function App() {
       <header className="topbar">
         <h1>MamuMatch</h1>
         <nav>
-          <Link to="/">Dashboard</Link>
-          <Link to="/jobs">Jobs</Link>
+          <Link className="topbar-link" to="/">Dashboard</Link>
+          <Link className="topbar-link" to="/jobs">Jobs</Link>
         </nav>
       </header>
       <main className="content">
