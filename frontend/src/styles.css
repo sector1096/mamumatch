@@ -57,14 +57,23 @@ input, select, button, a {
 button { cursor: pointer; }
 
 .topbar-link {
-  color: #ffffff;
+  color: #ffffff !important;
   text-decoration: none;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
   border-color: rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.08);
 }
 .topbar-link:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+.topbar-link:visited {
+  color: #ffffff !important;
 }
 
 table { width: 100%; border-collapse: collapse; }
@@ -72,6 +81,24 @@ th, td { border-bottom: 1px solid var(--border); text-align: left; padding: 8px;
 
 .actions-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .actions-row-inline { margin-top: 8px; }
+.section-nav { margin-bottom: 10px; }
+.pager-row { margin-bottom: 10px; }
+.nav-chip {
+  color: var(--text) !important;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+.nav-chip:visited {
+  color: var(--text) !important;
+}
 .badges-cell { display: flex; gap: 6px; flex-wrap: wrap; }
 .badge { font-size: 11px; border-radius: 999px; padding: 3px 8px; font-weight: 700; }
 .badge.ok { color: #fff; background: var(--ok); }

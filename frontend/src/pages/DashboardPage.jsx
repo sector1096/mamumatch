@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { Badge } from "../components/Badge";
@@ -23,19 +23,19 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const queryParams = useMemo(() => {
+  const buildParams = (source) => {
     const params = {};
-    Object.entries(filters).forEach(([k, v]) => {
+    Object.entries(source).forEach(([k, v]) => {
       if (v !== "") params[k] = v;
     });
     return params;
-  }, [filters]);
+  };
 
-  const load = async () => {
+  const load = async (sourceFilters = filters) => {
     try {
       setLoading(true);
       setError("");
-      const res = await api.getPartidas(queryParams);
+      const res = await api.getPartidas(buildParams(sourceFilters));
       setData(res);
     } catch (e) {
       setError(String(e.message || e));
@@ -44,9 +44,37 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
-    load();
+  React.useEffect(() => {
+    load(initialFilters);
   }, []);
+
+  const page = Number(data.page || filters.page || 1);
+  const size = Number(data.size || filters.size || 25);
+  const totalPages = Math.max(1, Math.ceil((data.total || 0) / Math.max(size, 1)));
+
+  const goToPage = (targetPage) => {
+    const nextPage = Math.max(1, Math.min(totalPages, targetPage));
+    const next = { ...filters, page: String(nextPage) };
+    setFilters(next);
+    load(next);
+  };
+
+  const applySearch = () => {
+    const next = { ...filters, page: "1" };
+    setFilters(next);
+    load(next);
+  };
+
+  const clearSearch = () => {
+    setFilters(initialFilters);
+    load(initialFilters);
+  };
+
+  const changeSize = (newSize) => {
+    const next = { ...filters, size: String(newSize), page: "1" };
+    setFilters(next);
+    load(next);
+  };
 
   const enqueue = async (id, tipo) => {
     await api.createJob(id, { tipo, payload: {} });
@@ -70,10 +98,10 @@ export default function DashboardPage() {
             </label>
           ))}
         <div className="actions-row">
-          <button onClick={() => setFilters((p) => ({ ...p, page: "1" })) || load()} disabled={loading}>
+          <button onClick={applySearch} disabled={loading}>
             Buscar
           </button>
-          <button onClick={() => { setFilters(initialFilters); setTimeout(load, 0); }}>
+          <button onClick={clearSearch} disabled={loading}>
             Limpiar
           </button>
         </div>
@@ -84,6 +112,19 @@ export default function DashboardPage() {
 
       <div className="panel">
         <p>Total: {data.total}</p>
+        <div className="actions-row pager-row">
+          <button onClick={() => goToPage(page - 1)} disabled={loading || page <= 1}>Anterior</button>
+          <span>Pagina {page} de {totalPages}</span>
+          <button onClick={() => goToPage(page + 1)} disabled={loading || page >= totalPages}>Siguiente</button>
+          <label className="inline-label">
+            <span>Por pagina</span>
+            <select value={String(size)} onChange={(e) => changeSize(Number(e.target.value))} disabled={loading}>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
         <table>
           <thead>
             <tr>

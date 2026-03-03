@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client";
 
 export default function JobsPage() {
@@ -30,6 +31,9 @@ export default function JobsPage() {
   return (
     <section>
       <h2>Jobs / Cola</h2>
+      <div className="actions-row section-nav">
+        <Link className="nav-chip" to="/">Volver</Link>
+      </div>
       <div className="panel filters-grid">
         {Object.keys(filters).filter((x) => x !== "page" && x !== "size").map((k) => (
           <label key={k}><span>{k}</span><input value={filters[k]} onChange={(e) => setFilters((p) => ({ ...p, [k]: e.target.value }))} /></label>

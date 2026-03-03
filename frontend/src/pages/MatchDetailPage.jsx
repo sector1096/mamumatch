@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { api } from "../api/client";
 
 const LANGS = ["es", "en", "pt", "ru", "zh", "fr"];
@@ -88,6 +88,10 @@ export default function MatchDetailPage() {
   return (
     <section>
       <h2>Partida #{item.id_partida}</h2>
+      <div className="actions-row section-nav">
+        <Link className="nav-chip" to="/">Volver</Link>
+        <Link className="nav-chip" to="/jobs">Jobs</Link>
+      </div>
       {error ? <p className="error">{error}</p> : null}
 
       <div className="panel grid2">
